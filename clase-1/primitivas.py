@@ -5,6 +5,24 @@ from OpenGL.GL import *
 from glew_wish import *
 import glfw
 
+def draw():
+    glBegin(GL_TRIANGLES)
+
+    #Establecer color
+    glColor3f(1,0,0)
+
+    #Manda vertices a dibujar
+    glVertex3f(-1,0,0)
+    glVertex3f(0,1,0)
+    glVertex3f(1,0,0)
+
+    glColor3f(0,0,1)
+    glVertex3f(-1,0,0)
+    glVertex3f(0,-1,0)
+    glVertex3f(1,0,0)
+
+    glEnd()
+
 def main():
     width = 800
     height = 600
@@ -44,13 +62,14 @@ def main():
     #Draw loop
     while not glfw.window_should_close(window):
         #Establecer el viewport
-        glViewport(0,0,width,height)
+        # glViewport(0,0,width,height)
         #Establecer color de borrado
-        glClearColor(0,1,0,1)
+        glClearColor(0.5,0.5,0.5,0.5)
         #Borrar el contenido del viewport
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         
         #Dibujar
+        draw()
 
         #Polling de inputs
         glfw.poll_events()
