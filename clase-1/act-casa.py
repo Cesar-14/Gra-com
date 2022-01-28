@@ -1,12 +1,10 @@
-#Importar librerías
-
 from turtle import width
 from OpenGL.GL import *
 from glew_wish import *
 import glfw
 import math
 
-def draw_nuves():
+def draw_nubes():
     #A-1
     glBegin(GL_POLYGON)
     glColor3f(1,1,1)
@@ -64,12 +62,156 @@ def draw_nuves():
 #--------------------------------------------------------------
 
 def darw_sol():
+    glBegin(GL_LINES)
+    glColor3f(1,1,0)
+
+    glVertex3f(-0.45,0.9,0)
+    glVertex3f(-0.65,0.8,0)
+
+    glVertex3f(-0.75,1,0)
+    glVertex3f(-0.75,0.9,0)
+
+    glVertex3f(-0.45,0.45,0)
+    glVertex3f(-0.65,0.6,0)
+
+    glVertex3f(-0.7,0.25,0)
+    glVertex3f(-0.75,0.5,0)
+
+    glVertex3f(-0.88,0.58,0)
+    glVertex3f(-0.99,0.45,0)
+
+    glVertex3f(-0.88,0.8,0)
+    glVertex3f(-0.99,0.9,0)
+
+    glEnd()
+
     glBegin(GL_POLYGON)
-    glColor3f(1, 0.8, 0)
+    glColor3f(1, 1, 0)
 
     for angulo in range(0,359,5):
-        glVertex3f(0.1*math.cos(angulo * math.pi / 180) - 0.75, 0.125*math.sin(angulo * math.pi / 180) + 0.7, 0)
+        glVertex3f(0.1 * math.cos(angulo * math.pi / 180) - 0.75, 0.125 * math.sin(angulo * math.pi / 180) + 0.7, 0)
 
+    glEnd()
+
+#--------------------------------------------------------------
+
+def draw_casa():
+    glBegin(GL_QUADS)
+    glColor3f(0.8,0.75,0.66)
+    glVertex3f(-0.2,0.1,0)
+    glVertex3f(0.5,0.1,0)
+    glVertex3f(0.5,-0.6,0)
+    glVertex3f(-0.2,-0.6,0)
+    glEnd()
+
+#--------------------------------------------------------------
+
+def draw_puerta():
+    glBegin(GL_QUADS)
+    glColor3f(0.39,0.26,0.12)
+    glVertex3f(-0.07,-0.25,0)
+    glVertex3f(0.1,-0.25,0)
+    glVertex3f(0.1,-0.6,0)
+    glVertex3f(-0.07,-0.6,0)
+    glEnd()
+
+    glBegin(GL_POLYGON)
+    glColor3f(0, 0, 0, 1)
+
+    for angulo in range(0,359,5):
+        glVertex3f(0.01 * math.cos(angulo * math.pi / 180) + 0.058, 0.013 * math.sin(angulo * math.pi / 180) - 0.43, 0)
+
+    glEnd()
+
+#--------------------------------------------------------------
+
+def darw_techo():
+    glBegin(GL_TRIANGLES)
+    glColor3f(0.3,0,0)
+    glVertex3f(-0.3,0.1,0)
+    glVertex3f(0.6,0.1,0)
+    glVertex3f(0.13,0.5,0)
+    glEnd()
+
+#--------------------------------------------------------------
+
+def draw_ventana():
+    glBegin(GL_QUADS)
+    glColor3f(0.8,0.95,0.6)
+    glVertex3f(0.45,-0.35,0)
+    glVertex3f(0.15,-0.35,0)
+    glVertex3f(0.15,-0.05,0)
+    glVertex3f(0.45,-0.05,0)
+    glEnd()
+    
+    glBegin(GL_LINES)
+    glColor3f(0,0,0)
+    glVertex3f(0.45,-0.2,0)
+    glVertex3f(0.15,-0.2,0)
+    glVertex3f(0.3,-0.35,0)
+    glVertex3f(0.3,-0.05,0)
+    glEnd()
+
+#--------------------------------------------------------------
+
+def draw_arbol():
+    glBegin(GL_POLYGON)
+    glColor3f(0.55,0.30,0.13)
+    glVertex3f(-0.7,-0.1,0)
+    glVertex3f(-0.6,-0.1,0)
+    glVertex3f(-0.6,-0.6,0)
+    glVertex3f(-0.7,-0.6,0)
+    glEnd()
+
+    glBegin(GL_POLYGON)
+    glColor3f(0,0.7,0.3)
+    for angulo in range(0,359,5):
+        glVertex3f(0.2 * math.cos(angulo * math.pi / 180) - 0.65, 0.25 * math.sin(angulo * math.pi / 180) + 0.2, 0)
+    glEnd()
+    
+    glBegin(GL_POLYGON)
+    glColor3f(0,0.7,0.3)
+    for angulo in range(0,359,5):
+        glVertex3f(0.2 * math.cos(angulo * math.pi / 180) - 0.65, 0.25 * math.sin(angulo * math.pi / 180) + -0.05, 0)
+    glEnd()
+
+#--------------------------------------------------------------
+
+def draw_pasto():
+    glBegin(GL_QUADS)
+    glColor3f(0.2,0.4,0)
+    glVertex3f(-1,-1,0)
+    glVertex3f(1,-1,0)
+    glVertex3f(1,-0.6,0)
+    glVertex3f(-1,-0.6,0)
+    glEnd()
+
+    glBegin(GL_LINES)
+    glColor3f(0.5,0.7,0)
+    glVertex3f(-0.83,-0.8,0)
+    glVertex3f(-0.8,-0.73,0)
+    glVertex3f(-0.83,-0.8,0)
+    glVertex3f(-0.85,-0.73,0)
+
+    glVertex3f(-0.4,-0.9,0)
+    glVertex3f(-0.45,-0.84,0)
+    glVertex3f(-0.4,-0.9,0)
+    glVertex3f(-0.38,-0.84,0)
+
+    glVertex3f(-0.2,-0.8,0)
+    glVertex3f(-0.25,-0.71,0)
+    glVertex3f(-0.2,-0.8,0)
+    glVertex3f(-0.2,-0.71,0)
+
+    glVertex3f(0.3,-0.9,0)
+    glVertex3f(0.35,-0.8,0)
+    glVertex3f(0.3,-0.9,0)
+    glVertex3f(0.3,-0.8,0)
+
+    glVertex3f(0.85,-0.8,0)
+    glVertex3f(0.8,-0.72,0)
+    glVertex3f(0.85,-0.8,0)
+    glVertex3f(0.75,-0.72,0)
     glEnd()
 
 #--------------------------------------------------------------
@@ -120,7 +262,13 @@ def main():
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         
         #Dibujar
-        draw_nuves()
+        draw_nubes()
+        draw_casa()
+        darw_techo()
+        draw_puerta()
+        draw_ventana()
+        draw_arbol()
+        draw_pasto()
         darw_sol()
 
         #Polling de inputs
