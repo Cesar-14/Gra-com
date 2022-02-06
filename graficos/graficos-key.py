@@ -12,11 +12,15 @@ import math
 color = [1.0, 0.0, 0.0]
 posicion = [0.0, 0.0]
 velocidad = 0.01
+color2 = [0.50, 0.18, 1.0]
+posicion2 = [0.0, 0.0]
 
 def key_callback(window, key, scancode, action, mods):
     global color
     global posicion
     global velocidad
+    global color2
+    global posicion2
 
     #Que la tecla scape cierre ventana
     if key == glfw.KEY_ESCAPE and action == glfw.PRESS:
@@ -60,6 +64,37 @@ def key_callback(window, key, scancode, action, mods):
     #Si se sale de los limites, que aparezca een el limite contrario
     #Ejemplo: si me salgo hacia arriba, aparezco abajo
 
+
+# TAREA - Cuadrado
+
+    #Se mueve hacia arriba
+    if key == glfw.KEY_W and (action == glfw.PRESS or glfw.REPEAT):
+        posicion2[1] = posicion2[1] + velocidad
+        #Verifico sali del limite superior
+           #si si sali, establezco la posicion con el valor
+           #del limite inferior
+        if posicion2[1] >= 1:
+            posicion2[1] = -1
+    
+
+    #Al presionar abajo se mueve hacia abajo
+    if key == glfw.KEY_S and (action == glfw.PRESS or glfw.REPEAT):
+        posicion2[1] = posicion2[1] - velocidad
+        if posicion2[1] <= -1:
+            posicion2[1] = 1
+
+
+    #Al presionar izquierda se mueve hacia la izquierda
+    if key == glfw.KEY_A and (action == glfw.PRESS or glfw.REPEAT):
+        posicion2[0] = posicion2[0] - velocidad
+        if posicion2[0] <= -1: 
+            posicion2[0] = 1
+
+    #Al presionar derecha se mueve hacia la derecha
+    if key == glfw.KEY_D and (action == glfw.PRESS or glfw.REPEAT):
+        posicion2[0] = posicion2[0] + velocidad
+        if posicion2[0] >= 1:
+            posicion2[0] = -1
     
 
 
@@ -78,6 +113,25 @@ def draw():
     glVertex3f(-0.08,-0.08,0)
     glVertex3f(0.0,0.08,0)
     glVertex3f(0.08,-0.08,0.0)
+
+    glEnd()
+    glPopMatrix()
+
+def draw_cuadrado():
+    global  color2
+    global  posicion2
+    
+    glPushMatrix()
+    
+    glTranslatef(posicion2[0], posicion2[1], 0.0)
+    glBegin(GL_POLYGON)
+    
+    glColor3f(color2[0],color2[1], color2[2])
+
+    glVertex3f(-0.08, -0.08,0.0)
+    glVertex3f(0.08, -0.08, 0.0)
+    glVertex3f(0.08, 0.08, 0.0)
+    glVertex3f(-0.08, 0.08, 0.0)
 
     glEnd()
     glPopMatrix()
@@ -134,7 +188,7 @@ def main():
 
         #Dibujar
         draw()
-
+        draw_cuadrado()
 
         #Polling de inputs
         glfw.poll_events()
