@@ -11,7 +11,7 @@ import math
 
 color = [1.0, 0.0, 0.0]
 posicion = [0.0, 0.0]
-velocidad = 0.01
+velocidad = 0.05
 color2 = [0.50, 0.18, 1.0]
 posicion2 = [0.0, 0.0]
 
