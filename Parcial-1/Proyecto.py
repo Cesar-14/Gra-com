@@ -1,0 +1,362 @@
+#Comandos para librerías
+#pip install pyopengl
+#pip install glfw
+
+#Importar librerias
+
+from OpenGL.GL import *
+from glew_wish import *
+import glfw
+import math
+
+# Unidades por segundo
+velocidad = 0.5
+
+# Posicion
+posicion_pared= [0.0, 0.8, 0.0]
+posicion_pared_2= [-0.8, 0.0, 0.0]
+posicion_pared_3= [0.8, 0.0, 0.0]
+posicion_pared_4 = [0.0, -0.8, 0.0]
+
+posicion_ganar = [0.7,-0.7,0]
+posicion_cuadrado = [-0.7, 0.7, 0.0]
+
+window = None
+
+tiempo_anterior = 0.0
+
+# Enemigos
+posicion_enemigos = 0.0
+posicion_enemigos_2 = 0.0
+
+def actualizar():
+    global tiempo_anterior
+    global window
+    global posicion_pared
+    global posicion_cuadrado
+
+    global posicion_enemigos
+    global posicion_enemigos_2
+
+    posicion_enemigos = posicion_enemigos + 0.01
+    if(posicion_enemigos >= 0.75):
+        posicion_enemigos = -0.75
+
+    tiempo_actual = glfw.get_time()
+    # Cuanto tiempo paso entre la ejecucion actual
+    # y la inmediata anterior de esta funcion
+    tiempo_delta = tiempo_actual - tiempo_anterior
+    
+    # Revisamos estados y realizamos acciones
+    cantidad_movimiento = velocidad * tiempo_delta
+
+    # Controles jugador
+    estado_tecla_w = glfw.get_key(window, glfw.KEY_W)
+    estado_tecla_s = glfw.get_key(window, glfw.KEY_S)
+    estado_tecla_a = glfw.get_key(window, glfw.KEY_D)
+    estado_tecla_d = glfw.get_key(window, glfw.KEY_A)
+
+    if estado_tecla_w == glfw.PRESS:
+        posicion_cuadrado[1] = posicion_cuadrado[1] + cantidad_movimiento
+    if estado_tecla_s == glfw.PRESS:
+        posicion_cuadrado[1] = posicion_cuadrado[1] - cantidad_movimiento
+    if estado_tecla_a == glfw.PRESS:
+        posicion_cuadrado[0] = posicion_cuadrado[0] + cantidad_movimiento
+    if estado_tecla_d == glfw.PRESS:
+        posicion_cuadrado[0] = posicion_cuadrado[0] - cantidad_movimiento
+
+    tiempo_anterior = tiempo_actual
+
+def colisionando():
+    colisionando = False
+    colision_ganar = False
+    # Metodo de Bounding Box
+    # Extrema derecha del triangulo >= Extrema izquierda cuadrado
+    # Extrema izquierda del triangulo <= Extrema derecha cuadrado
+    # Extremo superior del triangulo >= Extremo inferior del cuadrado
+    # Extremo inferior del triangulo <= Extremo superior del cuadrado
+    if (posicion_pared[0] + 0.43 >= posicion_cuadrado[0] - 0.43
+        and posicion_pared[0] - 0.43 <= posicion_cuadrado[0] + 0.43
+        and posicion_pared[1] + 0.03 >= posicion_cuadrado[1] - 0.03
+        and posicion_pared[1] - 0.03 <= posicion_cuadrado[1] + 0.03):
+        colisionando = True
+    
+
+    if (posicion_pared_2[0] + 0.03 >= posicion_cuadrado[0] - 0.03
+        and posicion_pared_2[0] - 0.03 <= posicion_cuadrado[0] + 0.03
+        and posicion_pared_2[1] + 0.43 >= posicion_cuadrado[1] - 0.43
+        and posicion_pared_2[1] - 0.43 <= posicion_cuadrado[1] + 0.43):
+        colisionando = True
+    
+
+    if (posicion_pared_3[0] + 0.03 >= posicion_cuadrado[0] - 0.03
+        and posicion_pared_3[0] - 0.03 <= posicion_cuadrado[0] + 0.03
+        and posicion_pared_3[1] + 0.43 >= posicion_cuadrado[1] - 0.43
+        and posicion_pared_3[1] - 0.43 <= posicion_cuadrado[1] + 0.43):
+        colisionando = True
+
+
+    if (posicion_pared_4[0] + 0.43 >= posicion_cuadrado[0] - 0.43
+        and posicion_pared_4[0] - 0.43 <= posicion_cuadrado[0] + 0.43
+        and posicion_pared_4[1] + 0.03 >= posicion_cuadrado[1] - 0.03
+        and posicion_pared_4[1] - 0.03 <= posicion_cuadrado[1] + 0.03):
+        colisionando = True
+
+    return colisionando
+
+def colision_ganar():
+    colision_ganar = False
+
+    if (posicion_ganar[0] + 0.075 >= posicion_cuadrado[0] - 0.075
+        and posicion_ganar[0] - 0.075 <= posicion_cuadrado[0] + 0.075
+        and posicion_ganar[1] + 0.075 >= posicion_cuadrado[1] - 0.075
+        and posicion_ganar[1] - 0.075 <= posicion_cuadrado[1] + 0.075):
+        colision_ganar = True
+    return colision_ganar
+
+
+
+
+def draw_pared():
+    global posicion_pared
+
+    glPushMatrix()
+    glTranslatef(posicion_pared[0], posicion_pared[1], 0.0)
+    glBegin(GL_QUADS)
+    glColor3f(0,0,0)
+    glVertex3f(-0.8, 0.01,0.0)
+    glVertex3f(0.8, 0.01,0.0)
+    glVertex3f(0.8, -0.01,0.0)
+    glVertex3f(-0.8, -0.01,0.0)
+    glEnd()
+
+    glPopMatrix()
+
+def draw_pared_2():
+    global posicion_pared_2
+
+    glPushMatrix()
+    glTranslatef(posicion_pared_2[0], posicion_pared_2[1], 0.0)
+    glBegin(GL_QUADS)
+    glColor3f(0,0,0)
+    glVertex3f(-0.01, 0.8,0.0)
+    glVertex3f(0.01, 0.8,0.0)
+    glVertex3f(0.01, -0.8,0.0)
+    glVertex3f(-0.01, -0.8,0.0)
+    glEnd()
+
+    glPopMatrix()
+
+def draw_pared_3():
+    global posicion_pared_3
+
+    glPushMatrix()
+    glTranslatef(posicion_pared_3[0], posicion_pared_3[1], 0.0)
+    glBegin(GL_QUADS)
+    glColor3f(0,0,0)
+    glVertex3f(-0.01, 0.8,0.0)
+    glVertex3f(0.01, 0.8,0.0)
+    glVertex3f(0.01, -0.8,0.0)
+    glVertex3f(-0.01, -0.8,0.0)
+    glEnd()
+
+    glPopMatrix()
+
+def draw_pared_4():
+    global posicion_pared_4
+
+    glPushMatrix()
+    glTranslatef(posicion_pared_4[0], posicion_pared_4[1], 0.0)
+    glBegin(GL_QUADS)
+    glColor3f(0,0,0)
+    glVertex3f(-0.8, 0.01,0.0)
+    glVertex3f(0.8, 0.01,0.0)
+    glVertex3f(0.8, -0.01,0.0)
+    glVertex3f(-0.8, -0.01,0.0)
+    glEnd()
+
+    glPopMatrix()
+
+def draw_ganar():
+
+    global posicion_ganar
+
+    glPushMatrix()
+    glTranslatef(posicion_ganar[0], posicion_ganar[1], 0.0)
+    glBegin(GL_QUADS)
+    glColor(0.2,1.0,0.7)
+    glVertex3f(0.1, -0.1, 0)
+    glVertex3f(0.1, 0.1, 0)
+    glVertex3f(-0.1, 0.1, 0)
+    glVertex3f(-0.1, -0.1, 0)
+    if colision_ganar():
+        glfw.terminate()
+    glEnd()
+
+    glPopMatrix()
+
+    # glBegin(GL_QUADS)
+    # glColor(0.2,1.0,0.7)
+    # glVertex3f(0.6, -0.6, 0)
+    # glVertex3f(0.6, -0.8, 0)
+    # glVertex3f(0.8, -0.8, 0)
+    # glVertex3f(0.8, -0.6, 0)
+    # if colisionando():
+    #     glfw.terminate()
+    # glEnd()
+
+def draw_inicio():
+
+    glBegin(GL_QUADS)
+    glColor(0.2,1.0,0.7)
+    glVertex3f(-0.6, 0.6, 0)
+    glVertex3f(-0.6, 0.8, 0)
+    glVertex3f(-0.8, 0.8, 0)
+    glVertex3f(-0.8, 0.6, 0)
+    glEnd()
+    
+
+
+def draw_enemigos():
+    global posicion_enemigos
+    glPushMatrix()
+    glTranslatef(posicion_enemigos, 0.85, 0.0)
+    glBegin(GL_QUADS)
+    glColor3f(0,0,0)
+    glVertex3f(-0.05, -0.9,0.0)
+    glVertex3f(0.05, -0.9,0.0)
+    glVertex3f(0.05, -0.8,0.0)
+    glVertex3f(-0.05, -0.8,0.0)
+    glEnd()
+
+    glBegin(GL_QUADS)
+    glColor3f(0,0,0)
+    glVertex3f(-0.05, -0.4,0.0)
+    glVertex3f(0.05, -0.4,0.0)
+    glVertex3f(0.05, -0.3,0.0)
+    glVertex3f(-0.05, -0.3,0.0)
+    glEnd()
+
+    glBegin(GL_QUADS)
+    glColor3f(0,0,0)
+    glVertex3f(-0.05, -1.4,0.0)
+    glVertex3f(0.05, -1.4,0.0)
+    glVertex3f(0.05, -1.3,0.0)
+    glVertex3f(-0.05, -1.3,0.0)
+    glEnd()
+    glPopMatrix()
+
+# Juagdor
+def draw_cuadrado():
+    
+    glPushMatrix()
+    glTranslatef(posicion_cuadrado[0], posicion_cuadrado[1], 0.0)
+    glBegin(GL_QUADS)
+    if colisionando():
+        glColor3f(0,0,1)
+    else: 
+        glColor3f(1,0,0)
+    glVertex3f(-0.05, 0.05,0.0)
+    glVertex3f(0.05, 0.05,0.0)
+    glVertex3f(0.05, -0.05,0.0)
+    glVertex3f(-0.05, -0.05,0.0)
+    # if colisionando():
+    #     # (Agregar colisión con pared)
+    glEnd()
+
+    glBegin(GL_LINE_LOOP)
+    glColor(0,0,0)
+    glVertex3f(-0.05, -0.05, 0)
+    glVertex3f(-0.05, 0.05, 0)
+    glVertex3f(0.05, 0.05, 0)
+    glVertex3f(0.05, -0.05, 0)
+    glEnd()
+
+    glPopMatrix()
+
+def draw_fondo():
+    glBegin(GL_QUADS)
+    glColor3f(0.9,1,0.9)
+    glVertex3f(-0.8, 0.8,0.0)
+    glVertex3f(0.8, 0.8,0.0)
+    glVertex3f(0.8, -0.8,0.0)
+    glVertex3f(-0.8, -0.8,0.0)
+    glEnd()
+
+def draw():
+    draw_fondo()
+
+    draw_inicio()
+    draw_ganar()
+    
+    draw_pared()
+    draw_pared_2()
+    draw_pared_3()
+    draw_pared_4()
+
+    draw_enemigos()
+    draw_cuadrado()
+
+def main():
+    global window
+
+    width = 700
+    height = 700
+    #Inicializar GLFW
+    if not glfw.init():
+        return
+
+    #declarar ventana
+    window = glfw.create_window(width, height, "Mi ventana", None, None)
+
+    #Configuraciones de OpenGL
+    glfw.window_hint(glfw.SAMPLES, 4)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
+    glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, GL_TRUE)
+    glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+
+    #Verificamos la creacion de la ventana
+    if not window:
+        glfw.terminate()
+        return
+
+    #Establecer el contexto
+    glfw.make_context_current(window)
+
+    #Le dice a GLEW que si usaremos el GPU
+    glewExperimental = True
+
+    #Inicializar glew
+    if glewInit() != GLEW_OK:
+        print("No se pudo inicializar GLEW")
+        return
+
+    #imprimir version
+    version = glGetString(GL_VERSION)
+    print(version)
+
+    #Draw loop
+    while not glfw.window_should_close(window):
+        #Establecer el viewport
+        #glViewport(0,0,width,height)
+        #Establecer color de borrado
+        glClearColor(0.6,0.7,1,1)
+        #Borrar el contenido del viewport
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+        #Dibujar
+        actualizar()
+        draw()
+
+        #Polling de inputs
+        glfw.poll_events()
+
+        #Cambia los buffers
+        glfw.swap_buffers(window)
+
+    glfw.destroy_window(window)
+    glfw.terminate()
+
+if __name__ == "__main__":
+    main()
