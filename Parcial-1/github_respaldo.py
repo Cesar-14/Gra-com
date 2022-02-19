@@ -40,15 +40,9 @@ def actualizar():
     global posicion_enemigos
     global posicion_enemigos_2
 
-    # Grupo enemigos 1
     posicion_enemigos = posicion_enemigos + 0.025
     if(posicion_enemigos >= 0.75):
         posicion_enemigos = -0.75
-    
-    # Grupo enemigos 2
-    posicion_enemigos_2 = posicion_enemigos_2 + 0.025
-    if(posicion_enemigos_2 >= 0.75):
-        posicion_enemigos_2 = -0.75
 
     tiempo_actual = glfw.get_time()
     # Cuanto tiempo paso entre la ejecucion actual
@@ -72,30 +66,24 @@ def actualizar():
     if estado_tecla_s == glfw.PRESS:
         if not colisionando():
             posicion_cuadrado[1] = posicion_cuadrado[1] - cantidad_movimiento
-        else:
-            posicion_cuadrado = [-0.7, 0.7, 0.0]
+            
     if estado_tecla_a == glfw.PRESS:
         if not colisionando():
             posicion_cuadrado[0] = posicion_cuadrado[0] + cantidad_movimiento
-        else:
-            posicion_cuadrado = [-0.7, 0.7, 0.0]
     if estado_tecla_d == glfw.PRESS:
         if not colisionando():
             posicion_cuadrado[0] = posicion_cuadrado[0] - cantidad_movimiento
-        else:
-            posicion_cuadrado = [-0.7, 0.7, 0.0]
+
     tiempo_anterior = tiempo_actual
 
 def colisionando():
     colisionando = False
     colision_ganar = False
-
     # Metodo de Bounding Box
     # Extrema derecha del triangulo >= Extrema izquierda cuadrado
     # Extrema izquierda del triangulo <= Extrema derecha cuadrado
     # Extremo superior del triangulo >= Extremo inferior del cuadrado
     # Extremo inferior del triangulo <= Extremo superior del cuadrado
-
     if (posicion_pared[0] + 0.43 >= posicion_cuadrado[0] - 0.43
         and posicion_pared[0] - 0.43 <= posicion_cuadrado[0] + 0.43
         and posicion_pared[1] + 0.03 >= posicion_cuadrado[1] - 0.03
@@ -123,14 +111,6 @@ def colisionando():
         and posicion_pared_4[1] - 0.03 <= posicion_cuadrado[1] + 0.03):
         colisionando = True
 
-# (Problema para añadir colisión a figuras circulares)
-    # Colisión enemigos
-    # if (posicion_enemigos[0] + 0.0 >= posicion_cuadrado[0] - 0.0
-    #     and posicion_enemigos[0] - 0.0 <= posicion_cuadrado[0] + 0.0
-    #     and posicion_enemigos[1] + 0.35 >= posicion_cuadrado[1] - 0.35
-    #     and posicion_enemigos[1] - 0.35 <= posicion_cuadrado[1] + 0.35):
-    #     colisionando = True
-
     return colisionando
 
 def colision_ganar():
@@ -142,6 +122,8 @@ def colision_ganar():
         and posicion_ganar[1] - 0.075 <= posicion_cuadrado[1] + 0.075):
         colision_ganar = True
     return colision_ganar
+
+
 
 
 def draw_pared():
@@ -251,8 +233,6 @@ def draw_enemigos():
     glTranslatef(posicion_enemigos, 0.85, 0.0)
     # if posicion_enemigos < 0.75:
     #     glTranslatef(posicion_enemigos, 0.0, -1)
-
-# (Intentar cambiarlos por cuadrados para probar colisión)
     glBegin(GL_POLYGON)
     glColor3f(0.2,0.2,0.9)
     for angulo in range(0,359,5):
@@ -270,35 +250,7 @@ def draw_enemigos():
     for angulo in range(0,359,5):
         glVertex3f(0.04 * math.cos(angulo * math.pi / 180) - 0.0, 0.04 * math.sin(angulo * math.pi/180) - 1.35, 0)
     glEnd()
-
     glPopMatrix()
-
-def draw_enemigos_2():
-    global posicion_enemigos_2
-    glPushMatrix()
-    glTranslatef(0.0, posicion_enemigos_2, 0.0)
-
-    glBegin(GL_POLYGON)
-    glColor3f(0.2,0.2,0.9)
-    for angulo in range(0,359,5):
-        glVertex3f(0.04 * math.cos(angulo * math.pi / 180) - 0.5, 0.04 * math.sin(angulo * math.pi/180) - 0, 0)
-    glEnd()
-
-    glBegin(GL_POLYGON)
-    glColor3f(0.2,0.2,0.9)
-    for angulo in range(0,359,5):
-        glVertex3f(0.04 * math.cos(angulo * math.pi / 180) + 0, 0.04 * math.sin(angulo * math.pi/180) - 0, 0)
-    glEnd()
-
-    glBegin(GL_POLYGON)
-    glColor3f(0.2,0.2,0.9)
-    for angulo in range(0,359,5):
-        glVertex3f(0.04 * math.cos(angulo * math.pi / 180) + 0.5, 0.04 * math.sin(angulo * math.pi/180) - 0, 0)
-
-    glEnd()
-    glPopMatrix()
-
-
 
 # Juagdor
 def draw_cuadrado():
@@ -349,7 +301,6 @@ def draw():
     draw_pared_4()
 
     draw_enemigos()
-    draw_enemigos_2()
     draw_cuadrado()
 
 def main():
