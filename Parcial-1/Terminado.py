@@ -21,7 +21,7 @@ window = None
 tiempo_anterior = 0.0
 
 # Unidades por segundo
-velocidad_enemigos = 2.3
+velocidad_enemigos = 4.3
 
 #Direcciones
 direccion_enemigos = 1
