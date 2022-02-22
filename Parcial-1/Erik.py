@@ -11,6 +11,10 @@ import math
 
 # Unidades por segundo
 velocidad = 0.4
+velocidad_enemigos = 1.3
+#Direccion del cuadrado
+direccion_enemigos = 1
+direccion_enemigos_2 = 1
 
 # Posicion
 posicion_pared= [0.0, 0.8, 0.0]
@@ -29,7 +33,41 @@ avanzar = True
 
 # Enemigos
 posicion_enemigos = 0.0
-posicion_enemigos_2 = 0.0
+posicion_enemigos_2 = [0.0, 0.0, 0.0]
+
+def actualizar_cuadrado(tiempo_delta):
+    global direccion_enemigos
+    global velocidad_enemigos
+    global posicion_enemigos
+    global posicion_enemigos_2
+    global direccion_enemigos_2
+    cantidad_movimiento = velocidad_enemigos * tiempo_delta
+    if direccion_enemigos == 0:
+        posicion_enemigos = posicion_enemigos - cantidad_movimiento
+    elif direccion_enemigos == 1:
+        posicion_enemigos = posicion_enemigos + cantidad_movimiento
+    
+    if posicion_enemigos <= -0.75 and direccion_enemigos == 0:
+        direccion_enemigos = 1
+        #posicion_cuadrado[1] = posicion_cuadrado[1] - 0.1
+    if posicion_enemigos >= 0.75 and direccion_enemigos == 1:
+        direccion_enemigos = 0
+        #posicion_cuadrado[0] = -1
+        #posicion_cuadrado[1] = posicion_cuadrado[1] - 0.1
+    if direccion_enemigos_2 == 0:
+        posicion_enemigos_2[1] = posicion_enemigos_2[1] - cantidad_movimiento
+    elif direccion_enemigos_2 == 1:
+        posicion_enemigos_2[1] = posicion_enemigos_2[1] + cantidad_movimiento
+    
+    if posicion_enemigos_2[1] <= -0.75 and direccion_enemigos_2 == 0:
+        direccion_enemigos_2 = 1
+        #posicion_cuadrado[1] = posicion_cuadrado[1] - 0.1
+    if posicion_enemigos_2[1] >= 0.75 and direccion_enemigos_2 == 1:
+        direccion_enemigos_2 = 0
+        #posicion_cuadrado[0] = -1
+        #posicion_cuadrado[1] = posicion_cuadrado[1] - 0.1
+
+
 
 def actualizar():
     global tiempo_anterior
@@ -39,16 +77,6 @@ def actualizar():
 
     global posicion_enemigos
     global posicion_enemigos_2
-
-    # Grupo enemigos 1
-    posicion_enemigos = posicion_enemigos + 0.025
-    if(posicion_enemigos >= 0.75):
-        posicion_enemigos = -0.75
-    
-    # Grupo enemigos 2
-    posicion_enemigos_2 = posicion_enemigos_2 + 0.025
-    if(posicion_enemigos_2 >= 0.75):
-        posicion_enemigos_2 = -0.75
 
     tiempo_actual = glfw.get_time()
     # Cuanto tiempo paso entre la ejecucion actual
@@ -84,6 +112,7 @@ def actualizar():
             posicion_cuadrado[0] = posicion_cuadrado[0] - cantidad_movimiento
         else:
             posicion_cuadrado = [-0.7, 0.7, 0.0]
+    actualizar_cuadrado(tiempo_delta)
     tiempo_anterior = tiempo_actual
 
 def colisionando():
@@ -253,6 +282,31 @@ def draw_enemigos():
     #     glTranslatef(posicion_enemigos, 0.0, -1)
 
 # (Intentar cambiarlos por cuadrados para probar colisión)
+    
+    # glBegin(GL_POLYGON)
+    # glColor3f(0.2,0.2,0.9)
+    # glVertex3f(-0.05, -0.4,0.0)
+    # glVertex3f(0.05, -0.4,0.0)
+    # glVertex3f(0.05, -0.3,0.0)
+    # glVertex3f(-0.05, -0.3,0.0)
+    # glEnd()
+
+    # glBegin(GL_POLYGON)
+    # glColor3f(0.2,0.2,0.9)
+    # glVertex3f(-0.05, -0.9,0.0)
+    # glVertex3f(0.05, -0.9,0.0)
+    # glVertex3f(0.05, -0.8,0.0)
+    # glVertex3f(-0.05, -0.8,0.0)
+    # glEnd()
+
+    # glBegin(GL_POLYGON)
+    # glColor3f(0.2,0.2,0.9)
+    # glVertex3f(-0.05, -1.4,0.0)
+    # glVertex3f(0.05, -1.4,0.0)
+    # glVertex3f(0.05, -1.3,0.0)
+    # glVertex3f(-0.05, -1.3,0.0)
+    # glEnd()
+
     glBegin(GL_POLYGON)
     glColor3f(0.2,0.2,0.9)
     for angulo in range(0,359,5):

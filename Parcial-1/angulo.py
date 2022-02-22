@@ -4,6 +4,7 @@
 
 #Importar librerias
 
+from cmath import cos, pi, sin
 from OpenGL.GL import *
 from glew_wish import *
 import glfw
@@ -12,51 +13,20 @@ import math
 #unidades por segundo
 velocidad = 0.5
 posicion_triangulo = [0.2,0.0,0.0]
+posicion_cuadrado = [-0.2, 0.0, 0.0]
+angulo_triangulo = 0.0
+fase = 90.0
+velocidad_rotacion_triangulo = 90.0
 window = None
 
-
-posiciones_cuadrados = [
-    [-0.4, 0.75, 0.0], 
-    [0.0, 0.75, 0.0], 
-    [0.4, 0.75, 0.0]]
-velocidades_cuadrados = [0.1,0.35,0.2]
-#direcciones 0 abajo 1 arriba
-direcciones_cuadrados = [0,0,0]
-activos_cuadrados = [1,0,0]
-
-contador_tiempo = 0.0
 tiempo_anterior = 0.0
-
-def actualizar_cuadrado(tiempo_delta):
-    global contador_tiempo
-
-    if glfw.get_time() > 3.0:
-        activos_cuadrados[2] = 1
-    if glfw.get_time() > 7.0:
-        activos_cuadrados[1] = 1
-
-    contador_tiempo = contador_tiempo + tiempo_delta
-    if contador_tiempo >= 1.0:
-        contador_tiempo = contador_tiempo - 1.0
-        for i in range(3):
-            velocidades_cuadrados[i] = velocidades_cuadrados[i] + 0.01
-    for i in range(3):
-        if activos_cuadrados[i]:
-            cantidad_movimiento = velocidades_cuadrados[i] * tiempo_delta
-            if direcciones_cuadrados[i] == 0:
-                posiciones_cuadrados[i][1] = posiciones_cuadrados[i][1] - cantidad_movimiento
-                if posiciones_cuadrados[i][1] <= -0.75:
-                    direcciones_cuadrados[i] = 1
-            else:
-                posiciones_cuadrados[i][1] = posiciones_cuadrados[i][1] + cantidad_movimiento
-                if posiciones_cuadrados[i][1] >= 0.75:
-                    direcciones_cuadrados[i] = 0
 
 def actualizar():
     global tiempo_anterior
     global window
     global posicion_triangulo
     global posicion_cuadrado
+    global angulo_triangulo
 
     tiempo_actual = glfw.get_time()
     #Cuanto tiempo paso entre la ejecucion actual
@@ -77,49 +47,63 @@ def actualizar():
     #Revisamos estados y realizamos acciones
     cantidad_movimiento = velocidad * tiempo_delta
     if estado_tecla_arriba == glfw.PRESS:
-        posicion_triangulo[1] = posicion_triangulo[1] + cantidad_movimiento
-    if estado_tecla_derecha == glfw.PRESS:
-        posicion_triangulo[0] = posicion_triangulo[0] + cantidad_movimiento
-    if estado_tecla_abajo == glfw.PRESS:
-        posicion_triangulo[1] = posicion_triangulo[1] - cantidad_movimiento
-    if estado_tecla_izquierda == glfw.PRESS:
-        posicion_triangulo[0] = posicion_triangulo[0] - cantidad_movimiento
+        posicion_triangulo[0] = posicion_triangulo[0] + (
+            math.cos((angulo_triangulo + fase) * pi / 180.0) * cantidad_movimiento
+        )
+        posicion_triangulo[1] = posicion_triangulo[1] + (
+            math.sin((angulo_triangulo + fase) * pi / 180.0) * cantidad_movimiento
+        )
+    #if estado_tecla_abajo == glfw.PRESS:
+        #posicion_triangulo[1] = posicion_triangulo[1] - cantidad_movimiento
 
-    actualizar_cuadrado(tiempo_delta)
+    cantidad_rotacion = velocidad_rotacion_triangulo * tiempo_delta
+    if estado_tecla_izquierda == glfw.PRESS:
+        angulo_triangulo = angulo_triangulo + cantidad_rotacion
+        if angulo_triangulo > 360.0:
+            angulo_triangulo = angulo_triangulo - 360.0 
+    if estado_tecla_derecha == glfw.PRESS:
+        angulo_triangulo = angulo_triangulo - cantidad_rotacion
+        if angulo_triangulo < 0.0:
+            angulo_triangulo = angulo_triangulo + 360.0
+
+    if estado_tecla_w == glfw.PRESS:
+        posicion_cuadrado[1] = posicion_cuadrado[1] + cantidad_movimiento
+    if estado_tecla_d == glfw.PRESS:
+        posicion_cuadrado[0] = posicion_cuadrado[0] + cantidad_movimiento
+    if estado_tecla_s == glfw.PRESS:
+        posicion_cuadrado[1] = posicion_cuadrado[1] - cantidad_movimiento
+    if estado_tecla_a == glfw.PRESS:
+        posicion_cuadrado[0] = posicion_cuadrado[0] - cantidad_movimiento
+
     tiempo_anterior = tiempo_actual
     
-def colisionando(x1,y1,wl1,wr1,hu1,hd1,x2,y2,wl2,wr2,hu2,hd2):
+def colisionando():
     colisionando = False
     #Método de bounding box:
-    #Extrema derecha del primero >= Extrema izquierda segundo
-    #Extrema izquierda del primero <= Extrema derecha segundo
-    #Extremo superior del primero >= Extremo inferior del segundo
-    #Extremo inferior del primero <= Extremo superior del segundo
-    if (x1 + wr1 >= x2 - wl2 
-        and x1 - wl1 <= x2 + wr2 
-        and y1 + hu1 >= y2 - hd2 
-        and y1 - hd1 <= y2 + hu2):
+    #Extrema derecha del triangulo >= Extrema izquierda cuadrado
+    #Extrema izquierda del triangulo <= Extrema derecha cuadrado
+    #Extremo superior del triangulo >= Extremo inferior del cuadrado
+    #Extremo inferior del triangulo <= Extremo superior del cuadrado
+    if (posicion_triangulo[0] + 0.05 >= posicion_cuadrado[0] - 0.05 
+        and posicion_triangulo[0] - 0.05 <= posicion_cuadrado[0] + 0.05 
+        and posicion_triangulo[1] + 0.05 >= posicion_cuadrado[1] - 0.05 
+        and posicion_triangulo[1] - 0.05 <= posicion_cuadrado[1] + 0.05):
         
         colisionando = True 
     return colisionando
+
 def draw_triangulo():
-    global window
     global posicion_triangulo
     glPushMatrix()
     glTranslatef(posicion_triangulo[0], posicion_triangulo[1],0.0)
+    glRotatef(angulo_triangulo, 0.0, 0.0, 1.0)
     glBegin(GL_TRIANGLES)
 
     #Establecer color
-    for i in range(3):
-        if colisionando(posicion_triangulo[0],posicion_triangulo[1],
-            0.05,0.05,0.05,0.05,
-            posiciones_cuadrados[i][0], posiciones_cuadrados[i][1],
-            0.05,0.05,0.05,0.05):
-            glColor3f(0,0,1)
-            glfw.set_window_should_close(window,True)
-            break
-        else:
-            glColor3f(1,0,0)
+    if colisionando():
+        glColor3f(0,0,1)
+    else:
+        glColor3f(1,0,0)
 
     #Manda vertices a dibujar
     glVertex3f(-0.05,-0.05,0)
@@ -139,27 +123,26 @@ def draw_triangulo():
     glPopMatrix()
 
 def draw_cuadrado():
-    global posiciones_cuadrados
-    for i in range(3):
-        glPushMatrix()
-        glTranslatef(posiciones_cuadrados[i][0], posiciones_cuadrados[i][1], 0.0)
-        glBegin(GL_QUADS)
-        glColor3f(0.4, 0.9, 0.21)
-        glVertex3f(-0.05,0.05,0.0)
-        glVertex3f(0.05,0.05,0.0)
-        glVertex3f(0.05,-0.05,0.0)
-        glVertex3f(-0.05,-0.05,0.0)
-        glEnd()
-        
-        glBegin(GL_LINE_LOOP)
-        glColor3f(0.0, 0.0, 0.0)
-        glVertex3f(-0.05,0.05,0.0)
-        glVertex3f(0.05,0.05,0.0)
-        glVertex3f(0.05,-0.05,0.0)
-        glVertex3f(-0.05,-0.05,0.0)
-        glEnd()
+    global posicion_cuadrado
+    glPushMatrix()
+    glTranslatef(posicion_cuadrado[0], posicion_cuadrado[1], 0.0)
+    glBegin(GL_QUADS)
+    glColor3f(0.4, 0.9, 0.21)
+    glVertex3f(-0.05,0.05,0.0)
+    glVertex3f(0.05,0.05,0.0)
+    glVertex3f(0.05,-0.05,0.0)
+    glVertex3f(-0.05,-0.05,0.0)
+    glEnd()
+    
+    glBegin(GL_LINE_LOOP)
+    glColor3f(0.0, 0.0, 0.0)
+    glVertex3f(-0.05,0.05,0.0)
+    glVertex3f(0.05,0.05,0.0)
+    glVertex3f(0.05,-0.05,0.0)
+    glVertex3f(-0.05,-0.05,0.0)
+    glEnd()
 
-        glPopMatrix()
+    glPopMatrix()
 
 def draw():
     draw_triangulo()
