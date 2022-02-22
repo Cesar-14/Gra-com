@@ -9,9 +9,19 @@ from glew_wish import *
 import glfw
 import math
 
-# Unidades por segundo
+#unidades por segundo
 velocidad = 0.4
-velocidad_enemigos = 1.3
+posicion_triangulo = [0.2,0.0,0.0]
+posicion_cuadrado = [-0.2, 0.0, 0.0]
+angulo_triangulo = 0.0
+fase = 90.0
+velocidad_rotacion_triangulo = 400.0
+window = None
+
+tiempo_anterior = 0.0
+
+# Unidades por segundo
+velocidad_enemigos = 2.3
 #Direccion del cuadrado
 direccion_enemigos = 1
 direccion_enemigos_2 = 1
@@ -25,23 +35,63 @@ posicion_pared_4 = [0.0, -0.8, 0.0]
 posicion_ganar = [0.7,-0.7,0]
 posicion_cuadrado = [-0.7, 0.7, 0.0]
 
-window = None
-
-tiempo_anterior = 0.0
-
 avanzar = True
 
 # Enemigos
 posicion_enemigos = 0.0
-posicion_enemigos_2 = [0.0, 0.0, 0.0]
+posicion_enemigos_2 = 0.0
 
-def actualizar_cuadrado(tiempo_delta):
+def actualizar_triangulo(tiempo_delta):
     global direccion_enemigos
     global velocidad_enemigos
     global posicion_enemigos
     global posicion_enemigos_2
     global direccion_enemigos_2
+    global tiempo_anterior
+    global window
+    global posicion_triangulo
+    global posicion_cuadrado
+    global angulo_triangulo
+
+    tiempo_actual = glfw.get_time()
+    #Cuanto tiempo paso entre la ejecucion actual
+    #y la inmediata anterior de esta funcion
+    tiempo_delta = tiempo_actual - tiempo_anterior
+
+    #Revisamos estados y realizamos acciones
+    cantidad_movimiento = velocidad * tiempo_delta
+    #if estado_tecla_abajo == glfw.PRESS:
+        #posicion_triangulo[1] = posicion_triangulo[1] - cantidad_movimiento
+
+    cantidad_rotacion = velocidad_rotacion_triangulo * tiempo_delta
+    if direccion_enemigos == 0:
+        angulo_triangulo = angulo_triangulo + cantidad_rotacion
+        posicion_enemigos = posicion_enemigos - cantidad_movimiento
+        if angulo_triangulo > 360.0:
+            angulo_triangulo = angulo_triangulo - 360.0 
+    if direccion_enemigos == 1:
+        angulo_triangulo = angulo_triangulo - cantidad_rotacion
+        posicion_enemigos = posicion_enemigos + cantidad_movimiento
+        if angulo_triangulo < 0.0:
+            angulo_triangulo = angulo_triangulo + 360.0
+    if posicion_enemigos <= -0.75 and direccion_enemigos == 0:
+        direccion_enemigos = 1
+        #posicion_cuadrado[1] = posicion_cuadrado[1] - 0.1
+    if posicion_enemigos >= 0.75 and direccion_enemigos == 1:
+        direccion_enemigos = 0
+
+    tiempo_anterior = tiempo_actual
+    
+
+def actualizar_cuadrado(tiempo_delta):
+    global direccion_enemigos
+    global velocidad_enemigos
+    global posicion_enemigos
+    # global posicion_enemigos_2
+    global direccion_enemigos_2
+
     cantidad_movimiento = velocidad_enemigos * tiempo_delta
+    
     if direccion_enemigos == 0:
         posicion_enemigos = posicion_enemigos - cantidad_movimiento
     elif direccion_enemigos == 1:
@@ -54,18 +104,18 @@ def actualizar_cuadrado(tiempo_delta):
         direccion_enemigos = 0
         #posicion_cuadrado[0] = -1
         #posicion_cuadrado[1] = posicion_cuadrado[1] - 0.1
-    if direccion_enemigos_2 == 0:
-        posicion_enemigos_2[1] = posicion_enemigos_2[1] - cantidad_movimiento
-    elif direccion_enemigos_2 == 1:
-        posicion_enemigos_2[1] = posicion_enemigos_2[1] + cantidad_movimiento
+    # if direccion_enemigos_2 == 0:
+    #     posicion_enemigos_2[1] = posicion_enemigos_2[1] - cantidad_movimiento
+    # elif direccion_enemigos_2 == 1:
+    #     posicion_enemigos_2[1] = posicion_enemigos_2[1] + cantidad_movimiento
     
-    if posicion_enemigos_2[1] <= -0.75 and direccion_enemigos_2 == 0:
-        direccion_enemigos_2 = 1
-        #posicion_cuadrado[1] = posicion_cuadrado[1] - 0.1
-    if posicion_enemigos_2[1] >= 0.75 and direccion_enemigos_2 == 1:
-        direccion_enemigos_2 = 0
-        #posicion_cuadrado[0] = -1
-        #posicion_cuadrado[1] = posicion_cuadrado[1] - 0.1
+    # if posicion_enemigos_2[1] <= -0.75 and direccion_enemigos_2 == 0:
+    #     direccion_enemigos_2 = 1
+    #     #posicion_cuadrado[1] = posicion_cuadrado[1] - 0.1
+    # if posicion_enemigos_2[1] >= 0.75 and direccion_enemigos_2 == 1:
+    #     direccion_enemigos_2 = 0
+    #     #posicion_cuadrado[0] = -1
+    #     #posicion_cuadrado[1] = posicion_cuadrado[1] - 0.1
 
 
 
@@ -112,7 +162,14 @@ def actualizar():
             posicion_cuadrado[0] = posicion_cuadrado[0] - cantidad_movimiento
         else:
             posicion_cuadrado = [-0.7, 0.7, 0.0]
+
+
+    if colision_enemigos():
+        posicion_cuadrado = [-0.7, 0.7, 0.0]
+
+
     actualizar_cuadrado(tiempo_delta)
+    actualizar_triangulo(tiempo_delta)
     tiempo_anterior = tiempo_actual
 
 def colisionando():
@@ -154,11 +211,11 @@ def colisionando():
 
 # (Problema para añadir colisión a figuras circulares)
     # Colisión enemigos
-    # if (posicion_enemigos[0] + 0.0 >= posicion_cuadrado[0] - 0.0
-    #     and posicion_enemigos[0] - 0.0 <= posicion_cuadrado[0] + 0.0
-    #     and posicion_enemigos[1] + 0.35 >= posicion_cuadrado[1] - 0.35
-    #     and posicion_enemigos[1] - 0.35 <= posicion_cuadrado[1] + 0.35):
-    #     colisionando = True
+    if (posicion_enemigos - 0.05 >= posicion_cuadrado[0] + 0.09
+        and posicion_enemigos + 0.05 <= posicion_cuadrado[0] - 0.09
+        and posicion_enemigos + 0.05 >= posicion_cuadrado[1] - 0.08
+        and posicion_enemigos - 0.05 <= posicion_cuadrado[1] - 0.08):
+        colision_enemigos = True
 
     return colisionando
 
@@ -171,6 +228,64 @@ def colision_ganar():
         and posicion_ganar[1] - 0.075 <= posicion_cuadrado[1] + 0.075):
         colision_ganar = True
     return colision_ganar
+
+def colision_enemigos():
+    # (Problema para añadir colisión a figuras circulares)
+    # Colisión enemigos
+
+    # Metodo de Bounding Box
+    # Extrema derecha del triangulo >= Extrema izquierda cuadrado
+    # Extrema izquierda del triangulo <= Extrema derecha cuadrado
+    # Extremo superior del triangulo >= Extremo inferior del cuadrado
+    # Extremo inferior del triangulo <= Extremo superior del cuadrado
+    colision_enemigos = False
+
+    # if (posicion_enemigos + 0.05 >= posicion_cuadrado[0] - 0.05
+    #     and posicion_enemigos - 0.05 <= posicion_cuadrado[0] + 0.05
+    #     and posicion_enemigos + 0.05 >= posicion_cuadrado[1] - 0.05
+    #     and posicion_enemigos - 0.05 <= posicion_cuadrado[1] + 0.05):
+    #     colision_enemigos = True
+
+    # if (posicion_enemigos - 0.05 >= posicion_cuadrado[0] + 0.09
+    #     and posicion_enemigos + 0.05 <= posicion_cuadrado[0] - 0.09
+    #     and posicion_enemigos + 0.05 >= posicion_cuadrado[1] - 0.08
+    #     and posicion_enemigos - 0.05 <= posicion_cuadrado[1] - 0.08):
+    #     colision_enemigos = True
+    
+    # if (posicion_enemigos - 0.05 >= posicion_cuadrado[0] - 0.09
+    #     and posicion_enemigos + 0.05 <= posicion_cuadrado[0] - 0.09
+    #     and posicion_enemigos + 0.05 >= posicion_cuadrado[1] - 0.08
+    #     and posicion_enemigos - 0.05 <= posicion_cuadrado[1] - 0.08):
+    #     colision_enemigos = True
+
+    # if (posicion_enemigos - 0.05 >= posicion_cuadrado[0] - 1.4
+    #     and posicion_enemigos + 0.05 <= posicion_cuadrado[0] - 1.4
+    #     and posicion_enemigos + 0.05 >= posicion_cuadrado[1] - 1.3
+    #     and posicion_enemigos - 0.05 <= posicion_cuadrado[1] - 1.3):
+    #     colision_enemigos = True
+    return colision_enemigos
+
+def draw_triangulo():
+    global posicion_triangulo
+    glPushMatrix()
+    glTranslatef(posicion_enemigos, 0.91,0.0)
+    glRotatef(angulo_triangulo, 0.0, 0.0, 1.0)
+    glBegin(GL_TRIANGLES)
+    glColor3f(0.8,0.8,1,5)
+    #Establecer color
+    # if colisionando():
+    #     glColor3f(0,0,1)
+    # else:
+    #     glColor3f(1,0,0)
+
+    #Manda vertices a dibujar
+    glVertex3f(-0.05,-0.05,0)
+    glVertex3f(0.0,0.05,0)
+    glVertex3f(0.05,-0.05,0)
+
+    glEnd()
+
+    glPopMatrix()
 
 
 def draw_pared():
@@ -225,13 +340,14 @@ def draw_pared_4():
     glPushMatrix()
     glTranslatef(posicion_pared_4[0], posicion_pared_4[1], 0.0)
     glBegin(GL_QUADS)
+
     glColor3f(0,0,0)
     glVertex3f(-0.8, 0.01,0.0)
     glVertex3f(0.8, 0.01,0.0)
     glVertex3f(0.8, -0.01,0.0)
     glVertex3f(-0.8, -0.01,0.0)
-    glEnd()
 
+    glEnd()
     glPopMatrix()
 
 def draw_ganar():
@@ -273,57 +389,69 @@ def draw_inicio():
     glEnd()
     
 
-
 def draw_enemigos():
     global posicion_enemigos
     glPushMatrix()
-    glTranslatef(posicion_enemigos, 0.85, 0.0)
+    # glTranslatef(posicion_enemigos, 0.85, 0.0)
     # if posicion_enemigos < 0.75:
     #     glTranslatef(posicion_enemigos, 0.0, -1)
 
 # (Intentar cambiarlos por cuadrados para probar colisión)
     
+    glTranslatef(posicion_enemigos, posicion_enemigos, 0.0)
+    glBegin(GL_POLYGON)
+    glColor3f(0.2,0.2,0.9)
+
+    glVertex3f(-0.05, 0.05,0.0)
+    glVertex3f(0.05, 0.05,0.0)
+    glVertex3f(0.05, -0.05,0.0)
+    glVertex3f(-0.05, -0.05,0.0)
+    glEnd()
+
+    glTranslatef(posicion_enemigos, posicion_enemigos, 0.0) 
+    glBegin(GL_POLYGON)
+    glColor3f(0.2,0.2,0.9)
+    glVertex3f(-0.05, 0.05,0.0)
+    glVertex3f(0.05, 0.05,0.0)
+    glVertex3f(0.05, -0.05,0.0)
+    glVertex3f(-0.05, -0.05,0.0)
+    glEnd()
+
+    glTranslatef(posicion_enemigos, posicion_enemigos, 0.0)
+    glBegin(GL_POLYGON)
+    glColor3f(0.2,0.2,0.9)
+    glVertex3f(-0.05, -0.9,0.0)
+    glVertex3f(0.05, -0.9,0.0)
+    glVertex3f(0.05, -0.8,0.0)
+    glVertex3f(-0.05, -0.8,0.0)
+    glEnd()
+
+    glTranslatef(posicion_enemigos, posicion_enemigos, 0.0)
+    glBegin(GL_POLYGON)
+    glColor3f(0.2,0.2,0.9)
+    glVertex3f(-0.05, -1.4,0.0)
+    glVertex3f(0.05, -1.4,0.0)
+    glVertex3f(0.05, -1.3,0.0)
+    glVertex3f(-0.05, -1.3,0.0)
+    glEnd()
+
     # glBegin(GL_POLYGON)
     # glColor3f(0.2,0.2,0.9)
-    # glVertex3f(-0.05, -0.4,0.0)
-    # glVertex3f(0.05, -0.4,0.0)
-    # glVertex3f(0.05, -0.3,0.0)
-    # glVertex3f(-0.05, -0.3,0.0)
+    # for angulo in range(0,359,5):
+    #     glVertex3f(0.04 * math.cos(angulo * math.pi / 180) - 0.0, 0.04 * math.sin(angulo * math.pi/180) - 0.35, 0)
     # glEnd()
 
     # glBegin(GL_POLYGON)
     # glColor3f(0.2,0.2,0.9)
-    # glVertex3f(-0.05, -0.9,0.0)
-    # glVertex3f(0.05, -0.9,0.0)
-    # glVertex3f(0.05, -0.8,0.0)
-    # glVertex3f(-0.05, -0.8,0.0)
+    # for angulo in range(0,359,5):
+    #     glVertex3f(0.04 * math.cos(angulo * math.pi / 180) - 0.0, 0.04 * math.sin(angulo * math.pi/180) - 0.85, 0)
     # glEnd()
 
     # glBegin(GL_POLYGON)
     # glColor3f(0.2,0.2,0.9)
-    # glVertex3f(-0.05, -1.4,0.0)
-    # glVertex3f(0.05, -1.4,0.0)
-    # glVertex3f(0.05, -1.3,0.0)
-    # glVertex3f(-0.05, -1.3,0.0)
+    # for angulo in range(0,359,5):
+    #     glVertex3f(0.04 * math.cos(angulo * math.pi / 180) - 0.0, 0.04 * math.sin(angulo * math.pi/180) - 1.35, 0)
     # glEnd()
-
-    glBegin(GL_POLYGON)
-    glColor3f(0.2,0.2,0.9)
-    for angulo in range(0,359,5):
-        glVertex3f(0.04 * math.cos(angulo * math.pi / 180) - 0.0, 0.04 * math.sin(angulo * math.pi/180) - 0.35, 0)
-    glEnd()
-
-    glBegin(GL_POLYGON)
-    glColor3f(0.2,0.2,0.9)
-    for angulo in range(0,359,5):
-        glVertex3f(0.04 * math.cos(angulo * math.pi / 180) - 0.0, 0.04 * math.sin(angulo * math.pi/180) - 0.85, 0)
-    glEnd()
-
-    glBegin(GL_POLYGON)
-    glColor3f(0.2,0.2,0.9)
-    for angulo in range(0,359,5):
-        glVertex3f(0.04 * math.cos(angulo * math.pi / 180) - 0.0, 0.04 * math.sin(angulo * math.pi/180) - 1.35, 0)
-    glEnd()
 
 # def draw_enemigos_2():
 #     global posicion_enemigos_2
@@ -358,10 +486,10 @@ def draw_cuadrado():
     glPushMatrix()
     glTranslatef(posicion_cuadrado[0], posicion_cuadrado[1], 0.0)
     glBegin(GL_QUADS)
-    # if colisionando():
-    #     glTranslatef(-0.7, 0.7, 0.0)
-    # else: 
-    glColor3f(1,0,0)
+    if colisionando():
+        glColor3f(0,0,1)
+    else:
+        glColor3f(1,0,0)
     glVertex3f(-0.05, 0.05,0.0)
     glVertex3f(0.05, 0.05,0.0)
     glVertex3f(0.05, -0.05,0.0)
@@ -383,15 +511,128 @@ def draw_cuadrado():
 def draw_fondo():
     glBegin(GL_QUADS)
     glColor3f(0.9,1,0.9)
+
     glVertex3f(-0.8, 0.8,0.0)
     glVertex3f(0.8, 0.8,0.0)
     glVertex3f(0.8, -0.8,0.0)
     glVertex3f(-0.8, -0.8,0.0)
     glEnd()
 
-def draw():
-    draw_fondo()
+def decoracion():
+    glPushMatrix()
+    glTranslatef(-0.9, 0.83, 0)
+    glBegin(GL_QUADS)
+    glColor3f(0.5,0.8,1,5)
 
+    glVertex3f(-0.05, 0.05,0.0)
+    glVertex3f(0.05, 0.05,0.0)
+    glVertex3f(0.05, -0.05,0.0)
+    glVertex3f(-0.05, -0.05,0.0)
+    glEnd()
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(-0.8, 0.33, 0)
+    glBegin(GL_QUADS)
+    glColor3f(0.8,0.8,1,5)
+
+    glVertex3f(-0.1, 0.1,0.0)
+    glVertex3f(0.1, 0.1,0.0)
+    glVertex3f(0.1, -0.1,0.0)
+    glVertex3f(-0.1, -0.1,0.0)
+    glEnd()
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(-1, -0.33, 0)
+    glBegin(GL_QUADS)
+    glColor3f(0.7,0.9,1,5)
+
+    glVertex3f(-0.08, 0.08,0.0)
+    glVertex3f(0.08, 0.08,0.0)
+    glVertex3f(0.08, -0.08,0.0)
+    glVertex3f(-0.08, -0.08,0.0)
+    glEnd()
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(1, -0.53, 0)
+    glBegin(GL_QUADS)
+    glColor3f(0.7,0.4,1,5)
+
+    glVertex3f(-0.09, 0.09,0.0)
+    glVertex3f(0.09, 0.09,0.0)
+    glVertex3f(0.09, -0.09,0.0)
+    glVertex3f(-0.09, -0.09,0.0)
+    glEnd()
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(0.9, -0.13, 0)
+    glBegin(GL_QUADS)
+    glColor3f(0.3,0.7,1,5)
+
+    glVertex3f(-0.03, 0.03,0.0)
+    glVertex3f(0.03, 0.03,0.0)
+    glVertex3f(0.03, -0.03,0.0)
+    glVertex3f(-0.03, -0.03,0.0)
+    glEnd()
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(1, 0.5, 0)
+    glBegin(GL_QUADS)
+    glColor3f(0.9,0.9,1,5)
+
+    glVertex3f(-0.15, 0.15,0.0)
+    glVertex3f(0.15, 0.15,0.0)
+    glVertex3f(0.15, -0.15,0.0)
+    glVertex3f(-0.15, -0.15,0.0)
+    glEnd()
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(1, -0.5, 0)
+    glBegin(GL_QUADS)
+    glColor3f(0.9,0.9,1,5)
+
+    glVertex3f(-0.15, 0.15,0.0)
+    glVertex3f(0.15, 0.15,0.0)
+    glVertex3f(0.15, -0.15,0.0)
+    glVertex3f(-0.15, -0.15,0.0)
+    glEnd()
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(1, 0.5, 0)
+    glBegin(GL_QUADS)
+    glColor3f(0.9,0.9,1,5)
+
+    glVertex3f(-0.15, 0.15,0.0)
+    glVertex3f(0.15, 0.15,0.0)
+    glVertex3f(0.15, -0.15,0.0)
+    glVertex3f(-0.15, -0.15,0.0)
+    glEnd()
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(1, -0.3, 0)
+    glBegin(GL_QUADS)
+    glColor3f(0.5,0.8,1,5)
+
+    glVertex3f(-0.15, 0.15,0.0)
+    glVertex3f(0.15, 0.15,0.0)
+    glVertex3f(0.15, -0.15,0.0)
+    glVertex3f(-0.15, -0.15,0.0)
+    glEnd()
+    glPopMatrix()
+    
+    
+
+
+def draw():
+    decoracion()
+    draw_fondo()
     draw_inicio()
     draw_ganar()
     
@@ -399,10 +640,10 @@ def draw():
     draw_pared_2()
     draw_pared_3()
     draw_pared_4()
-
     draw_enemigos()
-    # draw_enemigos_2()
+    # #draw_enemigos_2()
     draw_cuadrado()
+    draw_triangulo()
 
 def main():
     global window

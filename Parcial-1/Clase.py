@@ -30,9 +30,9 @@ tiempo_anterior = 0.0
 def actualizar_cuadrado(tiempo_delta):
     global contador_tiempo
 
-    if glfw.get_time() > 3.0:
+    if glfw.get_time() > 9.0:
         activos_cuadrados[2] = 1
-    if glfw.get_time() > 7.0:
+    if glfw.get_time() > 1.0:
         activos_cuadrados[1] = 1
 
     contador_tiempo = contador_tiempo + tiempo_delta
