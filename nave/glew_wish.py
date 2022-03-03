@@ -1,10 +1,13 @@
 #! /usr/bin/env python
 """ Temporary stand-in for GLEW functionality until a proper Python
 	module is created
+
 	glew_wish = you wish... get it.  Oh my god I'm so funny.
+
 	The naming convention in this script mimics that of the 
 	official GLEW API, that should make switching to the real
 	thing a little easier.
+
 	TODO:
 		[] -  See http://pyopengl.sourceforge.net/documentation/opengl_diffs.html and consider scrapping the GLEW
     lookup or simply wrapping PyOpenGL's native behaviour.
@@ -31,16 +34,21 @@ GL_VERSIONS = "GL_VERSION"
 
 def glewAreYouKidding():
 	""" Ugly ugly ugly hack to push GLEW variables in to the global namespace
+
 		The GLEW header contains macros and definitions to enumerate
 		available OpenGL functionality. The only way to provide these
 		variables in the global namespace of Python is to
 		work backwards through the call stack to add them globally
         to each calling stack frame.
+
+
 		Note:  Seriously, this is a garbage hack.  It will *heavily* pollutes
         all calling namespaces.
+
         Some functionality here might be useful later for injecting GLEW-like
         definitions in to Python.  Alternatively these functions could just 
         be moved in to a class that adds them to its members
+
 	"""
 	if not GLEW_INITIALIZED:
 		print("GLEW not initialized, call glewInit() first",file=stderr)
@@ -58,10 +66,13 @@ def glewAreYouKidding():
 
 def glewIsSupported(var):
 	""" Return True if var is valid extension/core pair
+
 		Usage: glewIsSupported("GL_VERSION_1_4  GL_ARB_point_sprite")
+
 		Note:  GLEW API was not well documented and this function was
 		written in haste so the actual GLEW format for glewIsSupported
 		might be different.
+
 		TODO: 
 			- Only the extension parameter is currently checked. Validate
 			the core as well.  Will likely require scraping opengl docs
@@ -85,12 +96,14 @@ def glewGetExtension(extension):
 
 def glewInit(unsafe=False):
 	""" GLEW initialization hack
+
         Glew Python packages are severely stale.  PyOpenGL does a 
         good job of exposing available functionality for OpenGL.
         It's likely GLEW is part of the PyOpenGL source (TODO: verify)
 		
         This glewInit works and will actually come up with a set of valid
         extensions supported by user's graphics card.
+
 		Input
 			unsafe (bool): if true, calls glewAreYouKidding to add glew definitions
 			to Pythons call stack (every single file)
